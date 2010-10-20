@@ -1,0 +1,8 @@
+make-simple-debian-package
+(C) 2010 Arlindo Pereira <nighto at nighto dot net>
+Licensed on GPLv3
+
+make-simple-debian-package is a very simple shell script to generate
+debian package files (also compatible with Ubuntu) that I created in
+order to create easy installators for my other scripts. Feel free to
+hack it!

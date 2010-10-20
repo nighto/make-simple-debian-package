@@ -1,0 +1,58 @@
+#!/bin/bash
+
+DATE=`date +%Y%m%d`
+
+echo "Enter the package name:"
+read PACKAGE_NAME
+
+# Creating package folder
+mkdir -p $PACKAGE_NAME-$DATE/DEBIAN
+
+# Copying files to /usr/bin
+echo "Enter the files that goes to /usr/bin (binary, scripts):"
+read BINARY_FILE
+mkdir -p $PACKAGE_NAME-$DATE/usr/bin
+cp $BINARY_FILE $PACKAGE_NAME-$DATE/usr/bin/.
+chmod +x $PACKAGE_NAME-$DATE/usr/bin/`basename $BINARY_FILE`
+
+# Copying files to /usr/share/doc
+echo "Enter the documentation files (README etc.):"
+read README_FILE
+mkdir -p $PACKAGE_NAME-$DATE/usr/share/doc/$PACKAGE_NAME
+cp $README_FILE $PACKAGE_NAME-$DATE/usr/share/doc/$PACKAGE_NAME/.
+
+# Creating the control file
+echo "Enter your name:"
+read NAME
+echo "Enter your email:"
+read EMAIL
+echo "Enter any packages that your program depends on:"
+read DEPENDS
+echo "Enter the section that your program belongs (such as multimedia, graphics etc.):"
+read SECTION
+echo "Enter the project homepage:"
+read HOMEPAGE
+echo "Enter the project description:"
+read DESCRIPTION
+
+SIZE=`du -c $PACKAGE_NAME-$DATE/usr | grep total | cut -f1`
+
+echo "Package: $PACKAGE_NAME
+Version: $DATE
+Architecture: all
+Maintainer: $NAME <$EMAIL>
+Installed-Size: $SIZE
+Depends: $DEPENDS
+Section: $SECTION
+Priority: optional
+Homepage: $HOMEPAGE
+Description: $DESCRIPTION" > $PACKAGE_NAME-$DATE/DEBIAN/control
+
+# Creating the md5sums file
+md5sum	$PACKAGE_NAME-$DATE/usr/bin/$BINARY_FILE \
+	$PACKAGE_NAME-$DATE/usr/share/doc/$PACKAGE_NAME/$README_FILE | \
+	sed s#$PACKAGE_NAME-$DATE/##g > $PACKAGE_NAME-$DATE/DEBIAN/md5sums
+
+# Creating the package itself && Removing temporary files
+dpkg -b $PACKAGE_NAME-$DATE && rm -rf $PACKAGE_NAME-$DATE
+
